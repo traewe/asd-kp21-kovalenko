@@ -29,6 +29,22 @@ namespace Laboratory
                             Console.WriteLine("\nTesting is failed");
                         }
                     }
+                    N = enterData(N, "N");
+                    M = enterData(M, "M");
+                    K = enterData(K, "K");
+                    maximumValue = enterData(maximumValue, "maximumValue");
+                    int[,] array = new int[N, M];
+
+                    // заповнення масиву псевдовипадковими числами
+                    for (int i = 0; i < N; i++)
+                    {
+                        for (int j = 0; j < M; j++)
+                        {
+                            array[i, j] = rnd.Next(1, maximumValue + 1);
+                        }
+                    }
+
+                    specialSort(array, N, M, K);
 
                     break;
                 }
@@ -40,6 +56,11 @@ namespace Laboratory
         }
         static int enterData(int x, string symbol)
         {
+            while (x < 1)
+            {
+                Console.WriteLine("Enter value for " + symbol);
+                x = Convert.ToInt32(Console.ReadLine());
+            }
             return x;
         }
         static int[,] specialSort(int[,] array, int n, int m, int K)
@@ -47,17 +68,91 @@ namespace Laboratory
             // список для чисел, що пройшли умову для сортування
             List<int> searchedNumbers = new();
 
+            // пошук чисел для сортування і вивід масиву до сортування
+            Console.WriteLine("Array before sorting");
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = 0; j < m; j++)
+                {
+                    if ((array[i, j] % K) % 2 == 0)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.Write(array[i, j] + "\t");
+                        searchedNumbers.Add(array[i, j]);
+                        array[i, j] = 0;
+                    }
+                    else
+                    {
+                        Console.ForegroundColor = ConsoleColor.Gray;
+                        Console.Write(array[i, j] + "\t");
+                    }
+                }
+                Console.WriteLine();
+            }
+
+            Console.ForegroundColor = ConsoleColor.Gray;
+            insertionSort(searchedNumbers);
+            searchedNumbers.Reverse();
+            Console.WriteLine("Array after sorting");
+
+            // сортування масиву і його вивід, виділяючи відсортовані числа зеленим кольором
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = 0; j < m; j++)
+                {
+                    if (array[i, j] == 0)
+                    {
+                        array[i, j] = searchedNumbers[0];
+                        searchedNumbers.RemoveAt(0);
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.Write(array[i, j] + "  \t");
+                    }
+                    else
+                    {
+                        Console.Write(array[i, j] + "  \t");
+                    }
+                    Console.ForegroundColor = ConsoleColor.Gray;
+                }
+                Console.WriteLine();
+            }
+
             return array;
         }
         static int binarySearch(List<int> givenList, int item, int left, int right)
         {
-            return 0;
+            if (left >= right)
+                return (item > givenList[left]) ? (left + 1) : left;
+
+            int mid = (left + right) / 2;
+
+            if (item == givenList[mid])
+                return mid;
+
+            else if (item > givenList[mid])
+                return binarySearch(givenList, item, mid + 1, right);
+
+            return binarySearch(givenList, item, left, mid - 1);
         }
         static void insertionSort(List<int> givenList)
         {
             int j;
             int searchedOrder;
             int key;
+
+            for (int i = 1; i < givenList.Count(); i++)
+            {
+                key = givenList[i];
+                j = i - 1;
+
+                searchedOrder = binarySearch(givenList, key, 0, j);
+
+                while (j >= searchedOrder)
+                {
+                    givenList[j + 1] = givenList[j];
+                    j--;
+                }
+                givenList[j + 1] = key;
+            }
         }
         static bool Test()
         {
